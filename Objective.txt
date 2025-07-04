@@ -1,0 +1,19 @@
+Project 1: Online Library Management System (MySQL)
+
+Problem Statement:
+Manual library systems make it hard to track books, issues, and
+returns efficiently.
+
+Objective:
+Develop a MySQL-based database to manage books, student
+records, issue-return logs, and generate reports.
+
+Requirements:
+MySQL
+PHP/Flask/Java (frontend optional)
+
+Tables: Books, Students, IssueLogs, Admins
+
+Expected Outcome:
+A structured DB that can be connected to any web or desktop
+app to manage a digital library.
