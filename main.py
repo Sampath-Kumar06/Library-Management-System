@@ -44,12 +44,12 @@ def main():
         print("7. Add Student")
         print("8. Add Book")
         print("9. Delete Student")
-        print("10.Delete Book")
-        print("11.Update Book Information")
-        print("12.Update Student Information")
+        print("10. Delete Book")
+        print("11. Update Book Information")
+        print("12. Update Student Information")
         print("13. View Available Books")
         print("14. View Issued Books")
-        print("15.Exit")
+        print("15. Exit")
         print("\n")
         choice=int(input("Enter your choice from above menu:"))
         rangee=[i for i in range(1,16)]
@@ -117,42 +117,90 @@ def issuelogs():
         
 # issue a book
 def issue_book():
-    print("[ Schema: student_name,  student_id,  book_name,  book_id ]")
-    cursor.execute("""select s.name,s.student_id,b.title,b.book_id
-                        from issuelogs i 
-                        left join students s on i.student_id=s.student_id
-                        join books b on i.book_id=b.book_id""")
-    for i in cursor.fetchall():
-        print(i)
-    stu_id=input("Enter student id:")
-    book_id=input("Enter book id:")
+    """
+    Issue a book only if it is currently marked as AVAILABLE.
+    Updates both `issuelogs` and `books` in a single transaction.
+    """
+    # Show available books for quick reference
+    view_available_books()
+
+    stu_id  = input("Enter student id: ").strip()
+    book_id = input("Enter book id: ").strip()
+
+    # Make sure the book exists and is available
+    cursor.execute("SELECT status FROM books WHERE book_id = %s", (book_id,))
+    res = cursor.fetchone()
+    if not res:
+        print("Book ID not found")
+        return
+    if res[0].lower() != "available":
+        print("Book is already issued or unavailable")
+        return
+
+    # Record issue + lock the book in a single commit
     try:
-        cursor.execute("INSERT INTO issuelogs (student_id, book_id, issue_date, status) VALUES (%s, %s, CURDATE(), 'issued')", (stu_id, book_id))
-        cursor.execute("UPDATE books SET status = 'issued' WHERE book_id = %s", (book_id,))
+        cursor.execute("""
+            INSERT INTO issuelogs (student_id, book_id, issue_date, status)
+            VALUES (%s, %s, CURDATE(), 'issued')
+        """, (stu_id, book_id))
+        cursor.execute("""
+            UPDATE books SET status = 'issued' WHERE book_id = %s
+        """, (book_id,))
         conn.commit()
-        print("Book issued Sucessfully.")
+        print("Book issued successfully")
     except Exception as e:
-        print(e)
+        conn.rollback()
+        print("Error issuing book:", e)
 
-
-# return a issued book
+# return book
 def return_book():
+    """
+    Return a book only if the selected issue record is still marked ISSUED.
+    Marks the issue as RETURNED and the book as AVAILABLE.
+    """
     print("[ Schema: issue_id,  student_name,  student_id,  book_name,  book_id,  issue_status ]")
-    cursor.execute("""select i.issue_id,s.name,i.student_id,b.title,i.book_id,i.status
-                        from issuelogs i 
-                        join students s on i.student_id = s.student_id
-                        join books b on i.book_id=b.book_id""")
-    for i in cursor.fetchall():
-        print(i)
-    issue_id=input('Enter issue_id:')
-    book_id=input('Enter book id:')
+    cursor.execute("""
+        SELECT i.issue_id, s.name, i.student_id, b.title, i.book_id, i.status
+        FROM issuelogs i
+        JOIN students s ON i.student_id = s.student_id
+        JOIN books   b ON i.book_id   = b.book_id
+    """)
+    for row in cursor.fetchall():
+        print(row)
+    print()
+
+    issue_id = input("Enter issue_id to return: ").strip()
+
+    # Confirm that this issue record exists and is still 'issued'
+    cursor.execute("""
+        SELECT book_id, status FROM issuelogs WHERE issue_id = %s
+    """, (issue_id,))
+    res = cursor.fetchone()
+    if not res:
+        print("Issue ID not found")
+        return
+    if res[1].lower() != "issued":
+        print("This book has already been returned")
+        return
+
+    book_id = res[0]
+
+    # Update both tables atomically
     try:
-        cursor.execute("update issuelogs set return_date=curdate(),status='returned' where issue_id=%s",(issue_id,))
-        cursor.execute("update books set status = 'available' WHERE book_id = %s", (book_id,))
+        cursor.execute("""
+            UPDATE issuelogs
+            SET return_date = CURDATE(), status = 'returned'
+            WHERE issue_id = %s
+        """, (issue_id,))
+        cursor.execute("""
+            UPDATE books SET status = 'available' WHERE book_id = %s
+            """, (book_id,))
         conn.commit()
-        print("Book returned Succesfully.")
+        print("Book returned successfully")
     except Exception as e:
-        print(e)
+        conn.rollback()
+        print("Error returning book:", e)
+
 
 
 # search book
