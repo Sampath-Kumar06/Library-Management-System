@@ -39,7 +39,7 @@ def main():
         print("2. View all books")
         print("3. view all issuelogs")
         print("4. Issue a book")
-        print("5. Return as book")
+        print("5. Return a book")
         print("6. Search books")
         print("7. Add Student")
         print("8. Add Book")
@@ -120,7 +120,7 @@ def issue_book():
     print("[ Schema: student_name,  student_id,  book_name,  book_id ]")
     cursor.execute("""select s.name,s.student_id,b.title,b.book_id
                         from issuelogs i 
-                        join students s on i.student_id=s.student_id
+                        left join students s on i.student_id=s.student_id
                         join books b on i.book_id=b.book_id""")
     for i in cursor.fetchall():
         print(i)
