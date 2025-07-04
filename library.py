@@ -126,7 +126,7 @@ def issue_book():
     cursor.execute('select student_id,name from students')
     for i in cursor.fetchall():
         print(i)
-        
+
     stu_id  = input("Enter student id: ").strip()
     book_id = input("Enter book id: ").strip()
 
@@ -252,7 +252,7 @@ def delete_student():
     cursor.execute("SELECT student_id,name,department from students")
     for i in cursor.fetchall():
         print(i)
-    student_id=input("Enter student_id")
+    student_id=input("Enter student_id:")
     try:
         cursor.execute("DELETE from students where student_id=%s",(student_id,))
         conn.commit()
