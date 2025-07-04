@@ -123,7 +123,10 @@ def issue_book():
     """
     # Show available books for quick reference
     view_available_books()
-
+    cursor.execute('select student_id,name from students')
+    for i in cursor.fetchall():
+        print(i)
+        
     stu_id  = input("Enter student id: ").strip()
     book_id = input("Enter book id: ").strip()
 
@@ -209,8 +212,8 @@ def search_book():
     cursor.execute("""select book_id,title from books""")
     for i in cursor.fetchall():
         print(i)
-    query=input("Please enter your query:")
-    cursor.execute(query)
+    book_id=input("Please enter book_id to search:")
+    cursor.execute('select * from books where book_id=%s',(book_id,))
     for i in cursor.fetchall():
         print("output-->:",i)
     print("\n")
