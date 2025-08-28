@@ -40,7 +40,3 @@ Developed as part of the internship program at **Thamizan Skills**.
 4. Run the app:
    ```bash
    python library.py
-
-##  Admin Login Credentials (for testing)
-- **Username**: sampath  
-- **Password**: sampath#12
