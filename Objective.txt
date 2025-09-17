@@ -10,7 +10,6 @@ records, issue-return logs, and generate reports.
 
 Requirements:
 MySQL
-PHP/Flask/Java (frontend optional)
 
 Tables: Books, Students, IssueLogs, Admins
 
