@@ -6,14 +6,6 @@ This is a simple Command-Line Interface (CLI) based **Library Management System*
 Developed as part of the internship program at **Thamizan Skills**.
 
 ---
-
-##  Tech Stack
-- **Python 3**
-- **MySQL Database**
-- MySQL Workbench (for DB design/export)
-
----
-
 ##  Features
 -  Admin login system with attempt limits
 -  Book Management (Add, View, Update, Delete)
@@ -38,5 +30,9 @@ Developed as part of the internship program at **Thamizan Skills**.
 2. Import the `database_schema.sql` file into MySQL Workbench.
 3. Update your database credentials in `library.py` if needed.
 4. Run the app:
-   ```bash
    python library.py
+
+##  Tech Stack
+- **Python 3**
+- **MySQL Database**
+- MySQL Workbench (for DB design/export)
